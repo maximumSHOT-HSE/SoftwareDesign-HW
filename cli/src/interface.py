@@ -30,7 +30,7 @@ class CommandLineInterface(object):
             user_input = Reader.read()
             result = emulator.execute_pipeline(user_input)
             if result:
-                print(result, end="")
+                print(result)
 
 
 if __name__ == "__main__":

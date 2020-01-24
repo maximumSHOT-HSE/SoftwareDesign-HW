@@ -155,7 +155,7 @@ class QuoteParser(object):
 
     @staticmethod
     def remove_quotes(expression):
-        """ Removes all quotes not in quotes from the given expression, leaving the string literals. """
+        """ Removes all unquoted quotes from the given expression, leaving the string literals. """
         remove = QuoteParser.find_unquoted_symbols(expression, re.compile(r'''['"]'''))
         return ''.join([expression[j] for j in range(len(expression)) if j not in remove])
 

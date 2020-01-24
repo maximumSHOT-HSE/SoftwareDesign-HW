@@ -47,7 +47,7 @@ class Cat(Command):
                 with open(file_name, 'r') as fin:
                     result += fin.read()
             except IOError as exception:
-                raise CommandException('cat: {}{}'.format(exception, os.linesep))
+                raise CommandException('cat: {}'.format(exception))
         return result
 
 
@@ -56,7 +56,7 @@ class Echo(Command):
     @staticmethod
     def run(args, input):
         """ Returns all of its arguments, separated by blank spaces. """
-        return ' '.join(args) + os.linesep
+        return ' '.join(args)
 
 
 class Exit(Command):
@@ -87,11 +87,11 @@ class External(Command):
         try:
             result = subprocess.run(args, check=True, input=encoded_input,
                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            return result.stdout.decode()
+            return result.stdout.decode().rstrip()
         except subprocess.CalledProcessError as error:
-            raise CommandException(error.stderr.decode())
+            raise CommandException(error.stderr.decode().rstrip())
         except FileNotFoundError:
-            raise CommandException("{}: command not found...{}".format(args[0], os.linesep))
+            raise CommandException("{}: command not found...".format(args[0]))
 
 
 class Pwd(Command):
@@ -99,7 +99,7 @@ class Pwd(Command):
     @staticmethod
     def run(args, input):
         """ Returns the name of the current working directory. """
-        return os.getcwd() + os.linesep
+        return os.getcwd()
 
 
 class Wc(Command):
@@ -118,9 +118,9 @@ class Wc(Command):
                 with open(args[0], 'r') as fin:
                     input = fin.read()
             except IOError as exception:
-                raise CommandException('wc: {}{}'.format(exception, os.linesep))
+                raise CommandException('wc: {}'.format(exception))
         if input:
             lines = input.count('\n')
             words = len(input.split())
             bytes = len(input)
-            return '{} {} {}{}'.format(lines, words, bytes, os.linesep)
+            return '{} {} {}'.format(lines, words, bytes)

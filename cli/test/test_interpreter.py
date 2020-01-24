@@ -11,17 +11,17 @@ class TestInterpreter(unittest.TestCase):
         self.emulator.variables["b"] = "6"
 
     def testExecutePipeline_pipelineReturningResult(self):
-        self.assertEqual(self.emulator.execute_pipeline("echo some text | echo more text").rstrip(), "more text")
+        self.assertEqual(self.emulator.execute_pipeline("echo some text | echo more text"), "more text")
 
     def testExecutePipeline_pipelineReturningNone(self):
         self.assertEqual(self.emulator.execute_pipeline("echo some text | echo some more text | var=179"), None)
 
     def testExecutePipeline_pipelineReturningException(self):
         exception = self.emulator.execute_pipeline("echo worked | hello_kitty meow | exit")
-        self.assertEqual(str(exception).rstrip(), "hello_kitty: command not found...")
+        self.assertEqual(str(exception), "hello_kitty: command not found...")
 
     def testExecutePipeline_pipelineWithAssignments(self):
-        self.assertEqual(self.emulator.execute_pipeline("a=7 | c=d4  | echo $a$c$b").rstrip(), "7d46")
+        self.assertEqual(self.emulator.execute_pipeline("a=7 | c=d4  | echo $a$c$b"), "7d46")
 
     def testExecutePipeline_pipelineWithExit(self):
         with self.assertRaises(SystemExit) as sys_exit:
@@ -32,7 +32,7 @@ class TestInterpreter(unittest.TestCase):
         self.assertEqual(self.emulator._execute_command(["cat"], "5"), "5")
         with self.assertRaises(CommandException) as raised:
             self.emulator._execute_command(["hello_kitty", "meow"], None)
-        self.assertEqual(str(raised.exception).rstrip(), "hello_kitty: command not found...")
+        self.assertEqual(str(raised.exception), "hello_kitty: command not found...")
 
     def testExecuteCommand_variableAssignment(self):
         self.assertEqual(self.emulator._execute_command(["a=6"], None), None)
