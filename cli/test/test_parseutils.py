@@ -176,3 +176,7 @@ class QuoteParserTest(unittest.TestCase):
     def testSplitKeepingQuotes_withMatchingPattern(self):
         self.assertListEqual(QuoteParser.split_keeping_quotes("aCaba'AAc'", self.LOWERCASE), ['', 'C', '', '', "'AAc'"])
         self.assertListEqual(QuoteParser.split_keeping_quotes('aCaba"AAc"', self.LOWERCASE), ['', 'C', '', '', '"AAc"'])
+
+
+if __name__ == '__main__':
+    unittest.main()

@@ -39,3 +39,7 @@ class TestInterpreter(unittest.TestCase):
         self.assertEqual(self.emulator.variables["a"], "6")
         self.assertEqual(self.emulator._execute_command(["c=dog"], None), None)
         self.assertEqual(self.emulator.variables["c"], "dog")
+
+
+if __name__ == '__main__':
+    unittest.main()
