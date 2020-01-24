@@ -1,2 +1,2 @@
 # SoftwareDesign-HW
-Homework for HSE Software Design course
+HW for HSE Software Design course
