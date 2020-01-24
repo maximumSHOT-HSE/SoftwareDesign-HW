@@ -27,21 +27,23 @@ class TestCat(unittest.TestCase):
 
     def test_oneFile(self):
         result = Cat.run([self.path + "oneFile"], None)
-        self.assertEqual(result, "5 4 3 2 1" + os.linesep)
+        self.assertEqual(result.rstrip(), "5 4 3 2 1")
 
     def test_emptyFile(self):
         result = Cat.run([self.path + "emptyFile"], None)
-        self.assertEqual(result, os.linesep)
+        self.assertEqual(result.rstrip(), "")
 
     def test_incorrectFileName(self):
         with self.assertRaises(CommandException) as raised:
             Cat.run([self.path + "notFile"], None)
-        self.assertEqual(str(raised.exception), "cat: [Errno 2] No such file or directory: 'test/resources/notFile'" + os.linesep)
+        if os.name == "posix":
+            self.assertEqual(str(raised.exception).rstrip(), "cat: [Errno 2] No such file or directory: 'test/resources/notFile'")
 
     def test_directory(self):
         with self.assertRaises(CommandException) as raised:
             Cat.run([self.path], None)
-        self.assertEqual(str(raised.exception), "cat: [Errno 21] Is a directory: 'test/resources/'" + os.linesep)
+        if os.name == "posix":
+            self.assertEqual(str(raised.exception).rstrip(), "cat: [Errno 21] Is a directory: 'test/resources/'")
 
     def test_severalFiles(self):
         result = Cat.run([self.path + "oneFile", self.path + "anotherFile"], None)
@@ -70,12 +72,14 @@ class TestWc(unittest.TestCase):
     def test_incorrectFileName(self):
         with self.assertRaises(CommandException) as raised:
             Wc.run([self.path + "notFile"], None)
-        self.assertEqual(str(raised.exception), "wc: [Errno 2] No such file or directory: 'test/resources/notFile'" + os.linesep)
+        if os.name == "posix":
+            self.assertEqual(str(raised.exception).rstrip(), "wc: [Errno 2] No such file or directory: 'test/resources/notFile'")
 
     def test_directory(self):
         with self.assertRaises(CommandException) as raised:
             Wc.run([self.path], None)
-        self.assertEqual(str(raised.exception), "wc: [Errno 21] Is a directory: 'test/resources/'" + os.linesep)
+        if os.name == "posix":
+            self.assertEqual(str(raised.exception).rstrip(), "wc: [Errno 21] Is a directory: 'test/resources/'")
 
     def test_severalFiles(self):
         result = Wc.run([self.path + "anotherFile", self.path + "oneFile"], None)
@@ -96,13 +100,13 @@ class TestExternal(unittest.TestCase):
     def test_wrongCommand(self):
         with self.assertRaises(CommandException) as raised:
             External.run(["hello_kitty", "5"], None)
-        self.assertEqual(str(raised.exception), "hello_kitty: command not found..." + os.linesep)
+        self.assertEqual(str(raised.exception).rstrip(), "hello_kitty: command not found...")
 
     def test_wrongCommandArguments(self):
         with self.assertRaises(CommandException) as raised:
             External.run(["find", "me"], None)
         if os.name == "posix":  # Idk what Windows should say
-            self.assertEqual(str(raised.exception), "find: ‘me’: No such file or directory\n")
+            self.assertEqual(str(raised.exception).rstrip(), "find: ‘me’: No such file or directory")
 
     def test_commandWithInput(self):
         if os.name == "posix":
@@ -111,7 +115,7 @@ class TestExternal(unittest.TestCase):
 
     def test_commandWithArgs(self):
         result = External.run(["echo", "test"], None)
-        self.assertEqual(result, "test" + os.linesep)
+        self.assertEqual(result.rstrip(), "test")
 
 
 class TestPwd(unittest.TestCase):
