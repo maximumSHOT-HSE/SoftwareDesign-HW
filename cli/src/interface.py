@@ -33,5 +33,5 @@ class CommandLineInterface(object):
                 print(result)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     CommandLineInterface.run()

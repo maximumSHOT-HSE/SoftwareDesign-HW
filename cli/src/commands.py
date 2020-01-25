@@ -41,7 +41,7 @@ class Cat(Command):
         """
         if not args:
             return input
-        result = ""
+        result = ''
         for file_name in args:
             try:
                 with open(file_name, 'r') as fin:
@@ -91,7 +91,7 @@ class External(Command):
         except subprocess.CalledProcessError as error:
             raise CommandException(error.stderr.decode().rstrip())
         except FileNotFoundError:
-            raise CommandException("{}: command not found...".format(args[0]))
+            raise CommandException('{}: command not found...'.format(args[0]))
 
 
 class Pwd(Command):
