@@ -1,7 +1,7 @@
 # SoftwareDesign-HW
 HW for HSE Software Design course
 
-1. A command line bash-like interpreter.
+1. A command line bash-like interpreter. Should be run using `interface.py`.
 
 Основной класс в программе это Interpreter, он собственно эмулирует работу bash.
 
