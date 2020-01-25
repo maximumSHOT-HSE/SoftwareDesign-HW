@@ -61,7 +61,6 @@ class TestInterpreter(unittest.TestCase):
         self.assertFalse(self.emulator._is_exit([]))
 
 
-
 class TestEnvironmentVariables(unittest.TestCase):
     def setUp(self):
         os.environ['a_var'] = 'value'
