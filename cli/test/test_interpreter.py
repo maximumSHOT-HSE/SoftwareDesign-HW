@@ -41,6 +41,16 @@ class TestInterpreter(unittest.TestCase):
         self.assertEqual(self.emulator._execute_command(['c=dog'], None), None)
         self.assertEqual(self.emulator._variables['c'], 'dog')
 
+    def testIsAssignment_isAssignment(self):
+        self.assertTrue(self.emulator._is_assignment(['a=6']))
+        self.assertTrue(self.emulator._is_assignment(['a=a=a']))
+        self.assertTrue(self.emulator._is_assignment(['c_w=d1og']))
+
+    def testIsAssignment_isNotAssignment(self):
+        self.assertFalse(self.emulator._is_assignment(['']))
+        self.assertFalse(self.emulator._is_assignment(['a=6', 'b=7']))
+        self.assertFalse(self.emulator._is_assignment(['q`w=2']))
+
 
 if __name__ == '__main__':
     unittest.main()

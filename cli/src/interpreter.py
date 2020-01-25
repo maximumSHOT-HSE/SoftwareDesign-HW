@@ -9,6 +9,7 @@ from src.parseutils import CommandExpander, PipelineSplitter
 class Interpreter(object):
     """ Class responsible for emulating the bash shell. """
     _SUPPORTED_COMMANDS = {'echo': Echo, 'cat': Cat, 'wc': Wc, 'pwd': Pwd, 'exit': Exit}
+    _ASSIGNMENT_PATTERN = re.compile(r'\w+?=\w*')
 
     def __init__(self):
         """ Initializes the dictionary of initialized variables. """
@@ -34,10 +35,15 @@ class Interpreter(object):
         return current_input
 
     def _execute_command(self, command, input):
-        if len(command) == 1 and re.match(re.compile(r'\w+?=\w*'), command[0]):
-            name, value = command[0].split('=', 1)
-            self._variables[name] = value
+        if self._is_assignment(command):
+            self._assign(*command[0].split('=', 1))
         elif len(command) and command[0] in self._SUPPORTED_COMMANDS.keys():
             return self._SUPPORTED_COMMANDS[command[0]].run(command[1:], input)
         else:
             return External.run(command, input)
+
+    def _is_assignment(self, command):
+        return len(command) == 1 and bool(re.match(self._ASSIGNMENT_PATTERN, command[0]))
+
+    def _assign(self, name, value):
+        self._variables[name] = value
