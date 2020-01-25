@@ -70,14 +70,15 @@ class CommandExpander(object):
         return [QuoteParser.remove_quotes(word) for word in words if word != '']
 
 
+class _State(Enum):
+    """ The state of the expression being parsed (is it in single or double quotes). """
+    UNQUOTED = 0
+    IN_SINGLE = 1
+    IN_DOUBLE = 2
+
+
 class QuoteParser(object):
     """ Class encapsulating all parsing of single and double quotes for an expression. """
-    class _State(Enum):
-        """ The current state of the expression being parsed (is it in single or double quotes). """
-        UNQUOTED = 0
-        IN_SINGLE = 1
-        IN_DOUBLE = 2
-
     @staticmethod
     def _next_state(state, next_symbol):
         """ Calculates the state of the expression after a new symbol has been processed.
@@ -89,12 +90,12 @@ class QuoteParser(object):
 
         :param state: The current state of the expression being parsed.
         :param next_symbol: A character that should be used to update the current state.
-        :return: A QuoteParser._State value corresponding to the next state.
+        :return: A _State value corresponding to the next state.
         """
         if next_symbol == '"':
-            return QuoteParser._State(2 - state.value)
+            return _State(2 - state.value)
         elif next_symbol == "'":
-            return QuoteParser._State(min(2, 1 ^ state.value))
+            return _State(min(2, 1 ^ state.value))
         else:
             return state
 
@@ -109,10 +110,10 @@ class QuoteParser(object):
         :param expression: A string for which the quotes should be checked.
         :return: A bool value, are all of the quotes in the expression closed correctly.
         """
-        state = QuoteParser._State.UNQUOTED
+        state = _State.UNQUOTED
         for symbol in expression:
             state = QuoteParser._next_state(state, symbol)
-        return state == QuoteParser._State.UNQUOTED
+        return state == _State.UNQUOTED
 
     @staticmethod
     def find_expandable_variables(expression):
@@ -125,11 +126,11 @@ class QuoteParser(object):
         :param expression: A string to find expandable variables in.
         :return: A set of indexes of expandable variables, where the value at each index is '$'.
         """
-        state = QuoteParser._State.UNQUOTED
+        state = _State.UNQUOTED
         result = set()
         for i, symbol in enumerate(expression):
             state = QuoteParser._next_state(state, symbol)
-            if state != QuoteParser._State.IN_SINGLE and symbol == '$':
+            if state != _State.IN_SINGLE and symbol == '$':
                 result.add(i)
         return result
 
@@ -144,12 +145,12 @@ class QuoteParser(object):
         :param pattern: A regex pattern that matches some single characters.
         :return: A set of indexes of matching symbols in the expression.
         """
-        state = QuoteParser._State.UNQUOTED
+        state = _State.UNQUOTED
         result = set()
         for i, symbol in enumerate(expression):
             old_state = state
             state = QuoteParser._next_state(state, symbol)
-            if re.match(pattern, symbol) and QuoteParser._State.UNQUOTED in (state, old_state):
+            if re.match(pattern, symbol) and _State.UNQUOTED in (state, old_state):
                 result.add(i)
         return result
 

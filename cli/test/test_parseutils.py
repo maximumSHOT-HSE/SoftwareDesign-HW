@@ -2,7 +2,7 @@ import os
 import re
 import unittest
 
-from src.parseutils import PipelineSplitter, QuoteParser, CommandExpander
+from src.parseutils import PipelineSplitter, QuoteParser, CommandExpander, _State
 
 
 class TestPipelineSplitter(unittest.TestCase):
@@ -96,27 +96,24 @@ class TestCommandExpander(unittest.TestCase):
 
 
 class QuoteParserTest(unittest.TestCase):
-    UNQUOTED = QuoteParser._State.UNQUOTED
-    IN_SINGLE = QuoteParser._State.IN_SINGLE
-    IN_DOUBLE = QuoteParser._State.IN_DOUBLE
     LOWERCASE = re.compile('[a-z]')
     UPPERCASE = re.compile('[A-Z]')
     QUOTES = re.compile(r'''['"]''')
 
     def testNextState_afterSingleQuote(self):
-        self.assertEqual(QuoteParser._next_state(self.UNQUOTED, "'"), self.IN_SINGLE)
-        self.assertEqual(QuoteParser._next_state(self.IN_SINGLE, "'"), self.UNQUOTED)
-        self.assertEqual(QuoteParser._next_state(self.IN_DOUBLE, "'"), self.IN_DOUBLE)
+        self.assertEqual(QuoteParser._next_state(_State.UNQUOTED, "'"), _State.IN_SINGLE)
+        self.assertEqual(QuoteParser._next_state(_State.IN_SINGLE, "'"), _State.UNQUOTED)
+        self.assertEqual(QuoteParser._next_state(_State.IN_DOUBLE, "'"), _State.IN_DOUBLE)
 
     def testNextState_afterDoubleQuote(self):
-        self.assertEqual(QuoteParser._next_state(self.UNQUOTED, '"'), self.IN_DOUBLE)
-        self.assertEqual(QuoteParser._next_state(self.IN_SINGLE, '"'), self.IN_SINGLE)
-        self.assertEqual(QuoteParser._next_state(self.IN_DOUBLE, '"'), self.UNQUOTED)
+        self.assertEqual(QuoteParser._next_state(_State.UNQUOTED, '"'), _State.IN_DOUBLE)
+        self.assertEqual(QuoteParser._next_state(_State.IN_SINGLE, '"'), _State.IN_SINGLE)
+        self.assertEqual(QuoteParser._next_state(_State.IN_DOUBLE, '"'), _State.UNQUOTED)
 
     def testNextState_afterNonQuote(self):
-        self.assertEqual(QuoteParser._next_state(self.UNQUOTED, '`'), self.UNQUOTED)
-        self.assertEqual(QuoteParser._next_state(self.IN_SINGLE, '`'), self.IN_SINGLE)
-        self.assertEqual(QuoteParser._next_state(self.IN_DOUBLE, '`'), self.IN_DOUBLE)
+        self.assertEqual(QuoteParser._next_state(_State.UNQUOTED, '`'), _State.UNQUOTED)
+        self.assertEqual(QuoteParser._next_state(_State.IN_SINGLE, '`'), _State.IN_SINGLE)
+        self.assertEqual(QuoteParser._next_state(_State.IN_DOUBLE, '`'), _State.IN_DOUBLE)
 
     def testQuotesMatch_quotesMatch(self):
         self.assertTrue(QuoteParser.quotes_match(""))
