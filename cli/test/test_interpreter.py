@@ -1,7 +1,8 @@
+import os
 import unittest
 
 from src.commands import CommandException
-from src.interpreter import Interpreter
+from src.interpreter import Interpreter, _EnvironmentVariables
 
 
 class TestInterpreter(unittest.TestCase):
@@ -50,6 +51,29 @@ class TestInterpreter(unittest.TestCase):
         self.assertFalse(self.emulator._is_assignment(['']))
         self.assertFalse(self.emulator._is_assignment(['a=6', 'b=7']))
         self.assertFalse(self.emulator._is_assignment(['q`w=2']))
+
+
+class TestEnvironmentVariables(unittest.TestCase):
+    def setUp(self):
+        os.environ['a_var'] = 'value'
+        self.variables = _EnvironmentVariables({'a': '6', 'b': '7', 'dog': 'cat'})
+
+    def testFindVariableValue_inVariable(self):
+        self.assertEqual(self.variables['a'], '6')
+
+    def testFindVariableValue_inEnvironment(self):
+        self.assertEqual(self.variables['a_var'], 'value')
+
+    def testFindVariableValue_noValue(self):
+        self.assertEqual(self.variables['aoaeibsoOQVWW'], '')
+
+    def testAssign_inInterpreter(self):
+        self.variables['a_var'] = 'new_value'
+        self.assertEqual(self.variables['a_var'], 'new_value')
+
+    def testAssign_inEnvironment(self):
+        os.environ['a_var'] = 'another_value'
+        self.assertEqual(self.variables['a_var'], 'another_value')
 
 
 if __name__ == '__main__':

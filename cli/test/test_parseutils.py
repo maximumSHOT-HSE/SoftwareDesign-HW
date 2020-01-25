@@ -2,6 +2,7 @@ import os
 import re
 import unittest
 
+from src.interpreter import _EnvironmentVariables
 from src.parseutils import PipelineSplitter, QuoteParser, CommandExpander, _State
 
 
@@ -25,7 +26,7 @@ class TestPipelineSplitter(unittest.TestCase):
 class TestCommandExpander(unittest.TestCase):
     def setUp(self):
         os.environ['a_var'] = 'value'
-        self.expander = CommandExpander({'a': '6', 'b': '7', 'dog': 'cat'})
+        self.expander = CommandExpander(_EnvironmentVariables({'a': '6', 'b': '7', 'dog': 'cat'}))
 
     def testParse_empty(self):
         self.assertListEqual(self.expander.parse(''), [])
@@ -68,19 +69,6 @@ class TestCommandExpander(unittest.TestCase):
     def testFindVariableEnd_endIsStringEnd(self):
         self.assertEqual(CommandExpander._find_variable_end('', 0), 0)
         self.assertEqual(CommandExpander._find_variable_end('$var1 $var2', 7), 11)
-
-    def testFindVariableValue_inVariable(self):
-        self.assertEqual(self.expander._find_variable_value('a'), '6')
-        self.expander._variables['a_var'] = 'new_value'
-        self.assertEqual(self.expander._find_variable_value('a_var'), 'new_value')
-
-    def testFindVariableValue_inEnvironment(self):
-        self.assertEqual(self.expander._find_variable_value('a_var'), 'value')
-        os.environ['a_var'] = 'another_value'
-        self.assertEqual(self.expander._find_variable_value('a_var'), 'another_value')
-
-    def testFindVariableValue_noValue(self):
-        self.assertEqual(self.expander._find_variable_value('aoaeibsoOQVWW'), '')
 
     def testSplitIntoArgumentList_oneArgument(self):
         self.assertListEqual(CommandExpander._split_into_argument_list('pwd'), ['pwd'])

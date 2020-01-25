@@ -22,7 +22,7 @@ class PipelineSplitter(object):
 class CommandExpander(object):
     """ Class responsible for performing all necessary substitutions for a command. """
     def __init__(self, variables):
-        """ Initializes the dictionary of variables to be used during substitution. """
+        """ Initializes the information about the variables to be used during substitution. """
         self._variables = variables
 
     def parse(self, command):
@@ -48,7 +48,7 @@ class CommandExpander(object):
                 start_index = cnt_index + 1
                 cnt_index = self._find_variable_end(command, start_index)
                 variable = command[start_index:cnt_index]
-                result += self._find_variable_value(variable)
+                result += self._variables[variable]
             else:
                 result += command[cnt_index]
                 cnt_index += 1
@@ -60,9 +60,6 @@ class CommandExpander(object):
             if re.match(re.compile(r'''\s|'|"|\$'''), command[i]):
                 return i
         return len(command)
-
-    def _find_variable_value(self, name):
-        return self._variables[name] if name in self._variables else environ.get(name, '')
 
     @staticmethod
     def _split_into_argument_list(command):

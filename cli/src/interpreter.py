@@ -1,9 +1,25 @@
 """ Module responsible for the main logic for the bash emulator. """
 
 import re
+from os import environ
 
 from src.commands import Echo, Cat, Wc, External, Pwd, Exit, CommandException
 from src.parseutils import CommandExpander, PipelineSplitter
+
+
+class _EnvironmentVariables(object):
+    """ Class responsible for interactions with the interpreter's existing variables. """
+    def __init__(self, variables):
+        """ Initializes an internal dictionary of variables for the interpreter. """
+        self.variables = variables
+
+    def __getitem__(self, name):
+        """ Returns the variable's in-interpreter value if it exists, or the environment value. """
+        return self.variables[name] if name in self.variables else environ.get(name, '')
+
+    def __setitem__(self, name, value):
+        """ Sets the given variable's value. """
+        self.variables[name] = value
 
 
 class Interpreter(object):
@@ -11,10 +27,11 @@ class Interpreter(object):
     _SUPPORTED_COMMANDS = {'echo': Echo, 'cat': Cat, 'wc': Wc, 'pwd': Pwd, 'exit': Exit}
     _ASSIGNMENT_PATTERN = re.compile(r'\w+?=\w*')
 
-    def __init__(self):
-        """ Initializes the dictionary of initialized variables. """
-        self._variables = {}
+    def __init__(self):  # , command_list):
+        """ Initializes the existing variables and the list of commands available for execution. """
+        self._variables = _EnvironmentVariables({})
         self._expander = CommandExpander(self._variables)
+        # self._supported_commands = command_list
 
     def execute_pipeline(self, commands):
         """ Emulates executing a pipeline of commands and returns their result.
@@ -36,7 +53,7 @@ class Interpreter(object):
 
     def _execute_command(self, command, input):
         if self._is_assignment(command):
-            self._assign(*command[0].split('=', 1))
+            self._variables.__setitem__(*command[0].split('=', 1))
         elif len(command) and command[0] in self._SUPPORTED_COMMANDS.keys():
             return self._SUPPORTED_COMMANDS[command[0]].run(command[1:], input)
         else:
@@ -44,6 +61,3 @@ class Interpreter(object):
 
     def _is_assignment(self, command):
         return len(command) == 1 and bool(re.match(self._ASSIGNMENT_PATTERN, command[0]))
-
-    def _assign(self, name, value):
-        self._variables[name] = value
