@@ -71,7 +71,7 @@ class TestCommandExpander(unittest.TestCase):
 
     def testFindVariableValue_inVariable(self):
         self.assertEqual(self.expander._find_variable_value("a"), "6")
-        self.expander.variables["a_var"] = "new_value"
+        self.expander._variables["a_var"] = "new_value"
         self.assertEqual(self.expander._find_variable_value("a_var"), "new_value")
 
     def testFindVariableValue_inEnvironment(self):

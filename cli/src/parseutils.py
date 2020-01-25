@@ -23,7 +23,7 @@ class CommandExpander(object):
     """ Class responsible for performing all necessary substitutions for a command. """
     def __init__(self, variables):
         """ Initializes the dictionary of variables to be used during substitution. """
-        self.variables = variables
+        self._variables = variables
 
     def parse(self, command):
         """ Parses the given command into a list of arguments.
@@ -62,13 +62,13 @@ class CommandExpander(object):
         return len(command)
 
     def _find_variable_value(self, name):
-        return self.variables[name] if name in self.variables else environ.get(name, '')
+        return self._variables[name] if name in self._variables else environ.get(name, '')
 
     @staticmethod
     def _split_into_argument_list(command):
         words = QuoteParser.split_keeping_quotes(command, re.compile(r'\s'))
         without_quotes = list(map(QuoteParser.remove_quotes, words))
-        return [word for word in words if word != '']
+        return [word for word in without_quotes if word != '']
 
 
 class _State(Enum):
