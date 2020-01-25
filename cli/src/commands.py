@@ -120,7 +120,7 @@ class Wc(Command):
             except IOError as exception:
                 raise CommandException('wc: {}'.format(exception))
         if input:
-            lines = input.count('\n')
+            lines = input.count(os.linesep) + 1
             words = len(input.split())
             bytes = len(input)
             return '{} {} {}'.format(lines, words, bytes)

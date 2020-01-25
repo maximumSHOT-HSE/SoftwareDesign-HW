@@ -1,5 +1,6 @@
 """ Module containing the interface of the bash emulator for interacting with the user. """
 
+import os
 
 from src.interpreter import Interpreter
 from src.parseutils import QuoteParser
@@ -16,7 +17,7 @@ class Reader(object):
          """
         result = input('$ ')
         while not QuoteParser.quotes_match(result) or result.rstrip().endswith('|'):
-            result += '\n' + input('> ')
+            result += os.linesep + input('> ')
         return result
 
 

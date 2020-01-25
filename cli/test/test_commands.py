@@ -64,11 +64,11 @@ class TestWc(unittest.TestCase):
 
     def test_oneFile(self):
         result = Wc.run([self.path + 'oneFile'], None)
-        self.assertEqual(result, '1 5 10')
+        self.assertEqual(result, '2 5 10')
 
     def test_emptyFile(self):
         result = Wc.run([self.path + 'emptyFile'], None)
-        self.assertEqual(result, '1 0 1')
+        self.assertEqual(result, '2 0 1')
 
     def test_incorrectFileName(self):
         with self.assertRaises(CommandException) as raised:
@@ -84,11 +84,11 @@ class TestWc(unittest.TestCase):
 
     def test_severalFiles(self):
         result = Wc.run([self.path + 'anotherFile', self.path + 'oneFile'], None)
-        self.assertEqual(result, '2 5 10')
+        self.assertEqual(result, '3 5 10')
 
     def test_noArgs(self):
         result = Wc.run([], 'inputted input')
-        self.assertEqual(result, '0 2 14')
+        self.assertEqual(result, '1 2 14')
 
 
 class TestExternal(unittest.TestCase):
