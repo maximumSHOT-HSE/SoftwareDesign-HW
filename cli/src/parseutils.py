@@ -41,7 +41,7 @@ class CommandExpander(object):
 
     def _expand_variables(self, command):
         dollar_indexes = QuoteParser.find_expandable_variables(command)
-        result = ""
+        result = ''
         cnt_index = 0
         while cnt_index < len(command):
             if cnt_index in dollar_indexes:
