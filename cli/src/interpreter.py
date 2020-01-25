@@ -15,23 +15,36 @@ class _EnvironmentVariables(object):
 
     def __getitem__(self, name):
         """ Returns the variable's in-interpreter value if it exists, or the environment value. """
-        return self.variables[name] if name in self.variables else environ.get(name, '')
+        return self.variables.get(name, environ.get(name, ''))
 
     def __setitem__(self, name, value):
         """ Sets the given variable's value. """
         self.variables[name] = value
 
 
+class _InterpreterCommands(object):
+    """ Class encapsulating the commands supported by a specific interpreter. """
+    def __init__(self, command_list):
+        self.commands = command_list
+
+    def __getitem__(self, command_name):
+        """ Returns a command runner by name or the External command if it is not supported. """
+        return self.commands.get(command_name, External)
+
+
 class Interpreter(object):
     """ Class responsible for emulating the bash shell. """
-    _SUPPORTED_COMMANDS = {'echo': Echo, 'cat': Cat, 'wc': Wc, 'pwd': Pwd, 'exit': Exit}
     _ASSIGNMENT_PATTERN = re.compile(r'\w+?=\w*')
 
-    def __init__(self):  # , command_list):
+    def __init__(self):
         """ Initializes the existing variables and the list of commands available for execution. """
         self._variables = _EnvironmentVariables({})
         self._expander = CommandExpander(self._variables)
-        # self._supported_commands = command_list
+        self._supported_commands = _InterpreterCommands({'echo': Echo,
+                                                         'cat': Cat,
+                                                         'wc': Wc,
+                                                         'pwd': Pwd,
+                                                         'exit': Exit})
 
     def execute_pipeline(self, commands):
         """ Emulates executing a pipeline of commands and returns their result.
@@ -54,8 +67,8 @@ class Interpreter(object):
     def _execute_command(self, command, input):
         if self._is_assignment(command):
             self._variables.__setitem__(*command[0].split('=', 1))
-        elif len(command) and command[0] in self._SUPPORTED_COMMANDS.keys():
-            return self._SUPPORTED_COMMANDS[command[0]].run(command[1:], input)
+        elif len(command) and self._supported_commands[command[0]] != External:
+            return self._supported_commands[command[0]].run(command[1:], input)
         else:
             return External.run(command, input)
 
