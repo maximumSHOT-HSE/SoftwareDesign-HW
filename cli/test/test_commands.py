@@ -1,6 +1,6 @@
 import os
 import unittest
-from src.commands import Echo, Cat, Wc, External, Pwd, Exit, CommandException
+from src.commands import Echo, Cat, Wc, External, Pwd, CommandException
 
 
 class TestEcho(unittest.TestCase):
@@ -131,23 +131,6 @@ class TestPwd(unittest.TestCase):
 
     def test_pwdWithInput(self):
         self.assertEqual(Pwd.run([], 'duck'), self.path)
-
-
-class TestExit(unittest.TestCase):
-    def test_exit(self):
-        with self.assertRaises(SystemExit) as sys_exit:
-            Exit.run([], None)
-        self.assertEqual(sys_exit.exception.code, 0)
-
-    def test_exitWithArgs(self):
-        with self.assertRaises(SystemExit) as sys_exit:
-            Exit.run(['1', '24', 'try'], None)
-        self.assertEqual(sys_exit.exception.code, 0)
-
-    def test_exitWithInput(self):
-        with self.assertRaises(SystemExit) as sys_exit:
-            Exit.run([], 'duck')
-        self.assertEqual(sys_exit.exception.code, 0)
 
 
 if __name__ == '__main__':

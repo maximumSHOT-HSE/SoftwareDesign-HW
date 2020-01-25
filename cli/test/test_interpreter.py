@@ -26,9 +26,8 @@ class TestInterpreter(unittest.TestCase):
         self.assertEqual(self.emulator.execute_pipeline('a=7 | c=d4  | echo $a$c$b'), '7d46')
 
     def testExecutePipeline_pipelineWithExit(self):
-        with self.assertRaises(SystemExit) as sys_exit:
-            self.emulator.execute_pipeline('echo 5 | cat|exit |echo 8')
-        self.assertEqual(sys_exit.exception.code, 0)
+        self.assertEqual(self.emulator.execute_pipeline('echo 5 | cat|exit |echo 8'), None)
+        self.assertFalse(self.emulator.is_running)
 
     def testExecuteCommand_commandExecution(self):
         self.assertEqual(self.emulator._execute_command(['cat'], '5'), '5')
@@ -51,6 +50,16 @@ class TestInterpreter(unittest.TestCase):
         self.assertFalse(self.emulator._is_assignment(['']))
         self.assertFalse(self.emulator._is_assignment(['a=6', 'b=7']))
         self.assertFalse(self.emulator._is_assignment(['q`w=2']))
+
+    def testIsExit_isExit(self):
+        self.assertTrue(self.emulator._is_exit(['exit']))
+        self.assertTrue(self.emulator._is_exit(['exit', '0', '1']))
+
+    def testIsExit_isNotExit(self):
+        self.assertFalse(self.emulator._is_exit(['ext']))
+        self.assertFalse(self.emulator._is_exit(['0', 'exit', '1']))
+        self.assertFalse(self.emulator._is_exit([]))
+
 
 
 class TestEnvironmentVariables(unittest.TestCase):

@@ -27,7 +27,7 @@ class CommandLineInterface(object):
     def run():
         """ Starts the emulator. """
         emulator = Interpreter()
-        while True:
+        while emulator.is_running:
             user_input = Reader.read()
             result = emulator.execute_pipeline(user_input)
             if result:

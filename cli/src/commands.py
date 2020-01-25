@@ -2,7 +2,6 @@
 
 import os
 import subprocess
-import sys
 from abc import abstractmethod
 
 
@@ -57,14 +56,6 @@ class Echo(Command):
     def run(args, input):
         """ Returns all of its arguments, separated by blank spaces. """
         return ' '.join(args)
-
-
-class Exit(Command):
-    """ Class for emulating running the exit command. """
-    @staticmethod
-    def run(args, input):
-        """ Exits the interpreter. """
-        sys.exit(0)
 
 
 class External(Command):

@@ -3,7 +3,7 @@
 import re
 from os import environ
 
-from src.commands import Echo, Cat, Wc, External, Pwd, Exit, CommandException
+from src.commands import Echo, Cat, Wc, External, Pwd, CommandException
 from src.parseutils import CommandExpander, PipelineSplitter
 
 
@@ -38,13 +38,13 @@ class Interpreter(object):
 
     def __init__(self):
         """ Initializes the existing variables and the list of commands available for execution. """
+        self.is_running = True
         self._variables = _EnvironmentVariables({})
         self._expander = CommandExpander(self._variables)
         self._supported_commands = _InterpreterCommands({'echo': Echo,
                                                          'cat': Cat,
                                                          'wc': Wc,
-                                                         'pwd': Pwd,
-                                                         'exit': Exit})
+                                                         'pwd': Pwd})
 
     def execute_pipeline(self, commands):
         """ Emulates executing a pipeline of commands and returns their result.
@@ -62,9 +62,14 @@ class Interpreter(object):
                 current_input = self._execute_command(expanded_command, current_input)
             except CommandException as exception:
                 return exception
+            if not self.is_running:
+                break
         return current_input
 
     def _execute_command(self, command, input):
+        if self._is_exit(command):
+            self.is_running = False
+            return
         if self._is_assignment(command):
             self._variables.__setitem__(*command[0].split('=', 1))
         elif len(command) and self._supported_commands[command[0]] != External:
@@ -74,3 +79,7 @@ class Interpreter(object):
 
     def _is_assignment(self, command):
         return len(command) == 1 and bool(re.match(self._ASSIGNMENT_PATTERN, command[0]))
+
+    @staticmethod
+    def _is_exit(command):
+        return len(command) and command[0] == 'exit'
