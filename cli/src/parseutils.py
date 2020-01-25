@@ -67,7 +67,8 @@ class CommandExpander(object):
     @staticmethod
     def _split_into_argument_list(command):
         words = QuoteParser.split_keeping_quotes(command, re.compile(r'\s'))
-        return [QuoteParser.remove_quotes(word) for word in words if word != '']
+        without_quotes = list(map(QuoteParser.remove_quotes, words))
+        return [word for word in words if word != '']
 
 
 class _State(Enum):
