@@ -186,7 +186,7 @@ class TestGrep(unittest.TestCase):
                     'test/resources/largeFile:though it may look like (Write it!) like disaster.',
                     '']
         result = Grep.run(['is', self.path + 'grepFile', self.path + 'largeFile'], None)
-        self.assertEqual(result, os.linesep.join(expected))
+        self.assertEqual(result, '\n'.join(expected))
 
     def test_grepWithRegexMatching(self):
         expected = ['to be lost that their loss is no disaster.',
@@ -196,7 +196,7 @@ class TestGrep(unittest.TestCase):
                     'I lost two cities, lovely ones. And, vaster,',
                     '']
         result = Grep.run(['-iw', 'los.', self.path + 'largeFile'], None)
-        self.assertEqual(result, os.linesep.join(expected))
+        self.assertEqual(result, '\n'.join(expected))
 
     def test_grepWithAfterContextSeveralFiles(self):
         expected = ['test/resources/largeFile:The art of losing isn’t hard to master;',
@@ -225,7 +225,7 @@ class TestGrep(unittest.TestCase):
                     'test/resources/largeFile-though it may look like (Write it!) like disaster.',
                     '']
         result = Grep.run(['-iA', '4', 'losing', self.path + 'grepFile', self.path + 'largeFile'], None)
-        self.assertEqual(result, os.linesep.join(expected))
+        self.assertEqual(result, '\n'.join(expected))
 
 
 if __name__ == '__main__':
