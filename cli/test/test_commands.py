@@ -225,7 +225,7 @@ class TestGrep(unittest.TestCase):
                     "test/resources/largeFile-though it may look like (Write it!) like disaster.",
                     ""]
         result = Grep.run(['-iA', '4', 'losing', self.path + 'grepFile', self.path + 'largeFile'], None)
-        self.assertEqual(result, '\n'.join(expected))
+        self.assertEqual(result, '\n'.join(expected).replace('--\n', '--' + os.linesep))  # Splitter is added separately
 
 
 if __name__ == '__main__':
