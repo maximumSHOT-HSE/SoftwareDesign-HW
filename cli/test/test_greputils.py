@@ -84,42 +84,32 @@ class TestGrepArguments(unittest.TestCase):
 
 class TestGrepOutputFormatter(unittest.TestCase):
     def testAddSplitter_differentFile(self):
+        expected = ['first:one line', '--', 'second:another line', '']
         output = GrepOutputFormatter(file_amount=3, needs_splitter=True)
         output.add_line('first', 1, 'one line' + os.linesep, True)
         output.add_line('second', 2, 'another line' + os.linesep, True)
-        self.assertEqual(output.format(),
-                         r'''first:one line
---
-second:another line
-''')
+        self.assertEqual(output.format(), os.linesep.join(expected))
 
     def testAddSplitter_sameFileNewSegment(self):
+        expected = ['first:one line', '--', 'first:another line', '']
         output = GrepOutputFormatter(file_amount=2, needs_splitter=True)
         output.add_line('first', 1, 'one line' + os.linesep, True)
         output.add_line('first', 3, 'another line' + os.linesep, True)
-        self.assertEqual(output.format(),
-                         r'''first:one line
---
-first:another line
-''')
+        self.assertEqual(output.format(), os.linesep.join(expected))
 
     def testAddSplitter_splitterNotSet(self):
+        expected = ['first:one line', 'first:another line', '']
         output = GrepOutputFormatter(file_amount=4, needs_splitter=False)
         output.add_line('first', 1, 'one line' + os.linesep, True)
         output.add_line('first', 4, 'another line' + os.linesep, True)
-        self.assertEqual(output.format(),
-                         r'''first:one line
-first:another line
-''')
+        self.assertEqual(output.format(), os.linesep.join(expected))
 
     def testAddSplitter_adjacentMatches(self):
+        expected = ['first:one line', 'first:another line', '']
         output = GrepOutputFormatter(file_amount=7, needs_splitter=True)
         output.add_line('first', 1, 'one line' + os.linesep, True)
         output.add_line('first', 2, 'another line' + os.linesep, True)
-        self.assertEqual(output.format(),
-                         r'''first:one line
-first:another line
-''')
+        self.assertEqual(output.format(), os.linesep.join(expected))
 
     def testAddFile_fileNeeded(self):
         output = GrepOutputFormatter(file_amount=2, needs_splitter=True)
@@ -132,19 +122,20 @@ first:another line
         self.assertEqual(output.format(), 'one line' + os.linesep)
 
     def testFormat_filesWithLinesep(self):
+        expected = ['first:one line',
+                    'first-not a match',
+                    '--',
+                    'second:another line',
+                    'second-also no match',
+                    'second:another matching line',
+                    '']
         output = GrepOutputFormatter(file_amount=3, needs_splitter=True)
         output.add_line('first', 1, 'one line' + os.linesep, True)
         output.add_line('first', 2, 'not a match' + os.linesep, False)
         output.add_line('second', 2, 'another line' + os.linesep, True)
         output.add_line('second', 3, 'also no match' + os.linesep, False)
         output.add_line('second', 4, 'another matching line' + os.linesep, True)
-        self.assertEqual(output.format(), r'''first:one line
-first-not a match
---
-second:another line
-second-also no match
-second:another matching line
-''')
+        self.assertEqual(output.format(), os.linesep.join(expected))
 
 
 if __name__ == '__main__':
