@@ -219,7 +219,7 @@ class TestGrep(unittest.TestCase):
                     "test/resources/largeFile-some realms I owned, two rivers, a continent.",
                     "test/resources/largeFile-I miss them, but it wasn't a disaster.",
                     "--",
-                    "test/resources/largeFile:—Even losing you (the joking voice, a gesture",
+                    "test/resources/largeFile:Even losing you (the joking voice, a gesture",
                     "test/resources/largeFile-I love) I shan't have lied. It's evident",
                     "test/resources/largeFile:the art of losing's not too hard to master",
                     "test/resources/largeFile-though it may look like (Write it!) like disaster.",
