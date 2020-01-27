@@ -1,6 +1,6 @@
 import os
 import unittest
-from src.commands import Echo, Cat, Wc, External, Pwd, CommandException
+from src.commands import Echo, Cat, Wc, External, Pwd, Grep, CommandException
 
 
 class TestEcho(unittest.TestCase):
@@ -37,7 +37,8 @@ class TestCat(unittest.TestCase):
         with self.assertRaises(CommandException) as raised:
             Cat.run([self.path + 'notFile'], None)
         if os.name == 'posix':
-            self.assertEqual(str(raised.exception), "cat: [Errno 2] No such file or directory: 'test/resources/notFile'")
+            self.assertEqual(str(raised.exception),
+                             "cat: [Errno 2] No such file or directory: 'test/resources/notFile'")
 
     def test_directory(self):
         with self.assertRaises(CommandException) as raised:
@@ -131,6 +132,100 @@ class TestPwd(unittest.TestCase):
 
     def test_pwdWithInput(self):
         self.assertEqual(Pwd.run([], 'duck'), self.path)
+
+
+class TestGrep(unittest.TestCase):
+    def setUp(self):
+        self.path = 'test/resources/'
+
+    def test_noInputNoFiles(self):
+        self.assertEqual(Grep.run(['pattern'], None), '')
+
+    def test_grepOnInput(self):
+        self.assertEqual(Grep.run(['find'], 'something to find'), 'something to find')
+        self.assertEqual(Grep.run(['find'], 'nothing for finding here'), 'nothing for finding here')
+        self.assertEqual(Grep.run(['-i', 'find'], 'Finding nothing'), 'Finding nothing')
+
+    def test_noMatches(self):
+        self.assertEqual(Grep.run(['find'], 'nothing here'), '')
+        self.assertEqual(Grep.run(['-w', 'find'], 'nothing for finding here'), '')
+        self.assertEqual(Grep.run(['-w', 'find'], 'Find nothing'), '')
+
+    def test_grepAllFlagsOn(self):
+        self.assertEqual(Grep.run(['-iwA', '10', 'find'], 'something to find'), 'something to find')
+        self.assertEqual(Grep.run(['-iwA', '10', 'find'], 'nothing for finding here'), '')
+        self.assertEqual(Grep.run(['-iwA', '10', 'find'], 'Find nothing'), 'Find nothing')
+
+    def test_wrongPattern(self):
+        with self.assertRaises(CommandException) as raised:
+            Grep.run([], None)
+        self.assertEqual(str(raised.exception), 'grep: the following arguments are required: PATTERN, FILE')
+
+    def test_incorrectFileName(self):
+        with self.assertRaises(CommandException) as raised:
+            Grep.run(['pattern', self.path + 'notFile'], None)
+        if os.name == 'posix':
+            self.assertEqual(str(raised.exception),
+                             "grep: [Errno 2] No such file or directory: 'test/resources/notFile'")
+
+    def test_directory(self):
+        with self.assertRaises(CommandException) as raised:
+            Grep.run(['pattern', self.path], None)
+        if os.name == 'posix':
+            self.assertEqual(str(raised.exception), "grep: [Errno 21] Is a directory: 'test/resources/'")
+
+    def test_grepOnSeveralFiles(self):
+        result = Grep.run(['is', self.path + 'grepFile', self.path + 'largeFile'], None)
+        self.assertEqual(result,
+                         r'''test/resources/grepFile:This is a line of text to test grep on.
+test/resources/grepFile:THis is another line.
+test/resources/largeFile:The art of losing isn’t hard to master;
+test/resources/largeFile:to be lost that their loss is no disaster.
+test/resources/largeFile:The art of losing isn’t hard to master.
+test/resources/largeFile:to travel. None of these will bring disaster.
+test/resources/largeFile:The art of losing isn’t hard to master.
+test/resources/largeFile:I miss them, but it wasn’t a disaster.
+test/resources/largeFile:though it may look like (Write it!) like disaster.
+''')
+
+    def test_grepWithRegexMatching(self):
+        result = Grep.run(['-iw', 'los.', self.path + 'largeFile'], None)
+        self.assertEqual(result,
+                         r'''to be lost that their loss is no disaster.
+Lose something every day. Accept the fluster
+of lost door keys, the hour badly spent.
+I lost my mother’s watch. And look! my last, or
+I lost two cities, lovely ones. And, vaster,
+''')
+
+    def test_grepWithAfterContextSeveralFiles(self):
+        result = Grep.run(['-iA', '4', 'losing', self.path + 'grepFile', self.path + 'largeFile'], None)
+        self.assertEqual(result,
+                         r'''test/resources/largeFile:The art of losing isn’t hard to master;
+test/resources/largeFile-so many things seem filled with the intent
+test/resources/largeFile-to be lost that their loss is no disaster.
+test/resources/largeFile-
+test/resources/largeFile-Lose something every day. Accept the fluster
+--
+test/resources/largeFile:The art of losing isn’t hard to master.
+test/resources/largeFile-
+test/resources/largeFile:Then practice losing farther, losing faster:
+test/resources/largeFile-places, and names, and where it was you meant
+test/resources/largeFile-to travel. None of these will bring disaster.
+test/resources/largeFile-
+test/resources/largeFile-I lost my mother’s watch. And look! my last, or
+--
+test/resources/largeFile:The art of losing isn’t hard to master.
+test/resources/largeFile-
+test/resources/largeFile-I lost two cities, lovely ones. And, vaster,
+test/resources/largeFile-some realms I owned, two rivers, a continent.
+test/resources/largeFile-I miss them, but it wasn’t a disaster.
+--
+test/resources/largeFile:—Even losing you (the joking voice, a gesture
+test/resources/largeFile-I love) I shan’t have lied. It’s evident
+test/resources/largeFile:the art of losing’s not too hard to master
+test/resources/largeFile-though it may look like (Write it!) like disaster.
+''')
 
 
 if __name__ == '__main__':

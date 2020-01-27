@@ -1,7 +1,6 @@
 """ Module responsible for the parsing of user input into pipelines and commands. """
 
 import re
-from os import environ
 from enum import Enum
 
 
