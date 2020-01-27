@@ -111,7 +111,7 @@ class Grep(Command):
         output = GrepOutputFormatter(len(parsed_args.files), parsed_args.was_context_set)
 
         if not parsed_args.files and input:
-            Grep._get_matches(output, '', parsed_args, input.split(os.linesep))
+            Grep._get_matches(output, '', parsed_args, input.splitlines(True))
         for file in parsed_args.files:
             Grep._process_file(output, parsed_args, file)
         return output.format()
