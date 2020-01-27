@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os
 import unittest
 from src.commands import Echo, Cat, Wc, External, Pwd, Grep, CommandException
