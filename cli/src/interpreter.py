@@ -3,7 +3,7 @@
 import re
 from os import environ
 
-from src.commands import Echo, Cat, Wc, External, Pwd, CommandException
+from src.commands import Echo, Cat, Cd, Grep, Wc, External, Ls, Pwd, CommandException
 from src.parseutils import CommandExpander, PipelineSplitter
 
 
@@ -44,7 +44,10 @@ class Interpreter(object):
         self._supported_commands = _InterpreterCommands({'echo': Echo,
                                                          'cat': Cat,
                                                          'wc': Wc,
-                                                         'pwd': Pwd})
+                                                         'pwd': Pwd,
+                                                         'grep': Grep,
+                                                         'ls': Ls,
+                                                         'cd': Cd})
 
     def execute_pipeline(self, commands):
         """ Emulates executing a pipeline of commands and returns their result.

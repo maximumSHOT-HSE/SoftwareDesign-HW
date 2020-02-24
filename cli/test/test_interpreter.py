@@ -13,6 +13,7 @@ class TestInterpreter(unittest.TestCase):
 
     def testExecutePipeline_pipelineReturningResult(self):
         self.assertEqual(self.emulator.execute_pipeline('echo some text | echo more text'), 'more text')
+        self.assertEqual(self.emulator.execute_pipeline('echo some text | grep some'), 'some text')
 
     def testExecutePipeline_pipelineReturningNone(self):
         self.assertEqual(self.emulator.execute_pipeline(''), None)

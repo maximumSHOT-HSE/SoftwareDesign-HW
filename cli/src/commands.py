@@ -1,8 +1,10 @@
 """ Module containing implementations of commands supported by the emulator. """
-
 import os
+import re
 import subprocess
 from abc import abstractmethod
+
+from src.greputils import GrepArguments, GrepOutputFormatter, ParsingException
 
 
 class CommandException(Exception):
@@ -85,12 +87,87 @@ class External(Command):
             raise CommandException('{}: command not found...'.format(args[0]))
 
 
+class Grep(Command):
+    """ Class for emulating running the grep command. """
+    @staticmethod
+    def run(args, input):
+        """ Runs the grep command.
+
+        The usage for the command should be grep [-iw] [-A N] PATTERN [FILE...].
+        Supported flags are:
+        -A <NUM>, --after-context=<NUM>  Print NUM lines of trailing context after matching lines.
+        -w, --word-regexp  Select only those lines containing matches that form whole words.
+        -i, --ignore-case  Ignore case distinctions, so that characters differing case-only match.
+
+        :param args: A list of arguments matching the usage pattern.
+        :param input: An input string to search on if no files are passed to grep.
+        :return: A string containing a list of matches for the pattern.
+        :raise: CommandException if the command's arguments are invalid.
+        """
+        try:
+            parsed_args = GrepArguments(args)
+        except ParsingException as exception:
+            raise CommandException('grep: {}'.format(exception))
+        output = GrepOutputFormatter(len(parsed_args.files), parsed_args.was_context_set)
+
+        if not parsed_args.files and input:
+            Grep._get_matches(output, '', parsed_args, input.splitlines(True))
+        for file in parsed_args.files:
+            Grep._process_file(output, parsed_args, file)
+        return output.format()
+
+    @staticmethod
+    def _process_file(output, parsed_args, file_name):
+        try:
+            with open(file_name, 'r') as fin:
+                file_contents = fin.readlines()
+        except IOError as exception:
+            raise CommandException('grep: {}'.format(exception))
+        Grep._get_matches(output, file_name, parsed_args, file_contents)
+
+    @staticmethod
+    def _get_matches(output, file_name, parsed_args, text):
+        print_end = -1
+        for i, line in enumerate(text):
+            if re.search(parsed_args.pattern, line):
+                print_end = i + parsed_args.after_context
+                output.add_line(file_name, i, line, True)
+            elif i <= print_end:
+                output.add_line(file_name, i, line, False)
+
+
 class Pwd(Command):
     """ Class for emulating running the pwd command. """
     @staticmethod
     def run(args, input):
         """ Returns the name of the current working directory. """
         return os.getcwd()
+
+
+class Ls(Command):
+    """ Class for emulating running the ls command. """
+    @staticmethod
+    def run(args, input):
+        """ Returns the list of files and directories in given directory. """
+        if len(args) > 1:
+            raise CommandException('ls: too many arguments, found {} arguments'.format(len(args)))
+        path = args[0] if len(args) == 1 else os.getcwd()
+        try:
+            return ' '.join(os.listdir(path))
+        except FileNotFoundError as e:
+            raise CommandException('ls: {}'.format(e))
+
+
+class Cd(Command):
+    """ Class for emulating running the cd command. """
+    @staticmethod
+    def run(args, input):
+        """ Changes current working directory. """
+        if len(args) > 1:
+            raise CommandException('cd: too many arguments, found {} arguments'.format(len(args)))
+        path = args[0] if len(args) == 1 else os.getenv('HOME')
+        os.chdir(path)
+        return ''
 
 
 class Wc(Command):
