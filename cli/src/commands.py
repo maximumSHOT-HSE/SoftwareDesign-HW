@@ -154,8 +154,8 @@ class Ls(Command):
         path = args[0] if len(args) == 1 else os.getcwd()
         try:
             return ' '.join(os.listdir(path))
-        except FileNotFoundError as e:
-            raise CommandException('ls: {}'.format(e))
+        except FileNotFoundError as error:
+            raise CommandException('ls: {}'.format(error))
 
 
 class Cd(Command):
@@ -166,7 +166,10 @@ class Cd(Command):
         if len(args) > 1:
             raise CommandException('cd: too many arguments, found {} arguments'.format(len(args)))
         path = args[0] if len(args) == 1 else os.getenv('HOME')
-        os.chdir(path)
+        try:
+            os.chdir(path)
+        except FileNotFoundError as error:
+            raise CommandException('cd: {}'.format(error))
         return ''
 
 
