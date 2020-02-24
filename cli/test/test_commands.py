@@ -1,6 +1,7 @@
 import os
 import unittest
-from src.commands import Echo, Cat, Wc, External, Pwd, Grep, CommandException
+
+from src.commands import Echo, Cat, Wc, External, Pwd, Grep, CommandException, Ls, Cd
 
 
 class TestEcho(unittest.TestCase):
@@ -132,6 +133,47 @@ class TestPwd(unittest.TestCase):
 
     def test_pwdWithInput(self):
         self.assertEqual(Pwd.run([], 'duck'), self.path)
+
+
+class TestLs(unittest.TestCase):
+    def setUp(self):
+        self.path = 'test/resources/for_ls'
+
+    def test_ls_with_argument(self):
+        self.assertEqual('dir1 dir2 file', Ls.run([self.path], '123'))
+
+    def test_ls_without_argument(self):
+        mem_cwd = os.getcwd()
+        os.chdir(self.path)
+        self.assertEqual('dir1 dir2 file', Ls.run([], '456'))
+        os.chdir(mem_cwd)
+
+    def test_ls_with_too_many_arguments(self):
+        with self.assertRaises(CommandException) as raised:
+            Ls.run(['.'] * 10, None)
+        self.assertEqual('ls: too many arguments, found 10 arguments', str(raised.exception))
+
+
+class TestCd(unittest.TestCase):
+
+    def test_cd_without_arguments(self):
+        Cd.run([], '')
+        self.assertEqual(os.getenv('HOME'), os.getcwd())
+
+    def test_cd_with_too_many_arguments(self):
+        with self.assertRaises(CommandException) as raised:
+            Cd.run(['.'] * 10, None)
+        self.assertEqual('cd: too many arguments, found 10 arguments', str(raised.exception))
+
+    def test_cd_with_one_argument(self):
+        mem_dir = os.getcwd()
+        Cd.run(['test/resources'], '')
+        self.assertEqual(os.path.join(mem_dir, 'test/resources'), os.getcwd())
+        Cd.run(['..'], '')
+        self.assertEqual(mem_dir, os.getcwd())
+        if os.name == 'posix':
+            Cd.run(['/home'], '')
+            self.assertEqual('/home', os.getcwd())
 
 
 class TestGrep(unittest.TestCase):
