@@ -43,11 +43,11 @@ class Interpreter(object):
         self._expander = CommandExpander(self._variables)
         self._supported_commands = _InterpreterCommands({'echo': Echo,
                                                          'cat': Cat,
+                                                         'cd': Cd,
                                                          'wc': Wc,
-                                                         'pwd': Pwd,
-                                                         'grep': Grep,
                                                          'ls': Ls,
-                                                         'cd': Cd})
+                                                         'pwd': Pwd,
+                                                         'grep': Grep})
 
     def execute_pipeline(self, commands):
         """ Emulates executing a pipeline of commands and returns their result.
