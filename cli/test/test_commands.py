@@ -138,15 +138,15 @@ class TestPwd(unittest.TestCase):
 class TestLs(unittest.TestCase):
     def setUp(self):
         self.path = 'test/resources/for_ls'
+        self.root = os.getcwd()
 
     def test_ls_with_argument(self):
         self.assertEqual('dir1 dir2 file', Ls.run([self.path], '123'))
 
     def test_ls_without_argument(self):
-        mem_cwd = os.getcwd()
         os.chdir(self.path)
         self.assertEqual('dir1 dir2 file', Ls.run([], '456'))
-        os.chdir(mem_cwd)
+        os.chdir(self.root)
 
     def test_ls_with_too_many_arguments(self):
         with self.assertRaises(CommandException) as raised:
@@ -156,6 +156,9 @@ class TestLs(unittest.TestCase):
 
 class TestCd(unittest.TestCase):
 
+    def setUp(self):
+        self.root = os.getcwd()
+
     def test_cd_without_arguments(self):
         Cd.run([], '')
         self.assertEqual(os.getenv('HOME'), os.getcwd())
@@ -164,6 +167,7 @@ class TestCd(unittest.TestCase):
         with self.assertRaises(CommandException) as raised:
             Cd.run(['.'] * 10, None)
         self.assertEqual('cd: too many arguments, found 10 arguments', str(raised.exception))
+        os.chdir(self.root)
 
     def test_cd_with_one_argument(self):
         mem_dir = os.getcwd()
@@ -174,6 +178,7 @@ class TestCd(unittest.TestCase):
         if os.name == 'posix':
             Cd.run(['/home'], '')
             self.assertEqual('/home', os.getcwd())
+        os.chdir(self.root)
 
 
 class TestGrep(unittest.TestCase):
