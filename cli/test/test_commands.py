@@ -144,9 +144,10 @@ class TestLs(unittest.TestCase):
         self.assertEqual('dir1 dir2 file', Ls.run([self.path], '123'))
 
     def test_ls_without_argument(self):
-        os.chdir(self.path)
-        self.assertEqual('dir1 dir2 file', Ls.run([], '456'))
-        os.chdir(self.root)
+        self.assertEqual('hah', os.getcwd())
+        # os.chdir(self.path)
+        # self.assertEqual('dir1 dir2 file', Ls.run([], '456'))
+        # os.chdir(self.root)
 
     def test_ls_with_too_many_arguments(self):
         with self.assertRaises(CommandException) as raised:
