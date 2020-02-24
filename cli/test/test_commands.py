@@ -174,6 +174,8 @@ class TestCd(unittest.TestCase):
         Cd.run(['test/resources'], '')
         self.assertEqual(os.path.join(mem_dir, 'test/resources'), os.getcwd())
         Cd.run(['..'], '')
+        self.assertEqual(os.path.join(mem_dir, 'test'), os.getcwd())
+        Cd.run(['..'], '')
         self.assertEqual(mem_dir, os.getcwd())
         if os.name == 'posix':
             Cd.run(['/home'], '')
