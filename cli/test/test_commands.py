@@ -137,7 +137,7 @@ class TestPwd(unittest.TestCase):
 
 class TestLs(unittest.TestCase):
     def setUp(self):
-        self.path = 'test/resources/for_ls'
+        self.path = os.path.join('test', 'resources', 'for_ls')
         self.root = os.getcwd()
 
     def test_ls_with_argument(self):
@@ -180,8 +180,8 @@ class TestCd(unittest.TestCase):
 
     def test_cd_with_one_argument(self):
         mem_dir = os.getcwd()
-        Cd.run(['test/resources'], '')
-        self.assertEqual(os.path.join(mem_dir, 'test/resources'), os.getcwd())
+        Cd.run([os.path.join('test', 'resources')], '')
+        self.assertEqual(os.path.join(mem_dir, os.path.join('test', 'resources')), os.getcwd())
         Cd.run(['..'], '')
         self.assertEqual(os.path.join(mem_dir, 'test'), os.getcwd())
         Cd.run(['..'], '')
