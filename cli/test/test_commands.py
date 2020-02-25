@@ -144,7 +144,6 @@ class TestLs(unittest.TestCase):
         self.assertEqual('dir1 dir2 file', Ls.run([self.path], '123'))
 
     def test_ls_without_argument(self):
-        self.assertEqual('hah', os.getcwd())
         os.chdir(self.path)
         self.assertEqual('dir1 dir2 file', Ls.run([], '456'))
         os.chdir(self.root)
