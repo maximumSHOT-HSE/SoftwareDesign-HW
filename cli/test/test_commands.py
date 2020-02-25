@@ -141,11 +141,19 @@ class TestLs(unittest.TestCase):
         self.root = os.getcwd()
 
     def test_ls_with_argument(self):
-        self.assertEqual('dir1 dir2 file', Ls.run([self.path], '123'))
+        expected_list = 'dir1 dir2 file'.split(' ')
+        found_list = Ls.run([self.path], '123').split(' ')
+        expected_list.sort()
+        found_list.sort()
+        self.assertEqual(expected_list, found_list)
 
     def test_ls_without_argument(self):
         os.chdir(self.path)
-        self.assertEqual('dir1 dir2 file', Ls.run([], '456'))
+        expected_list = 'dir1 dir2 file'.split(' ')
+        found_list = Ls.run([], '456').split(' ')
+        expected_list.sort()
+        found_list.sort()
+        self.assertEqual(expected_list, found_list)
         os.chdir(self.root)
 
     def test_ls_with_too_many_arguments(self):
