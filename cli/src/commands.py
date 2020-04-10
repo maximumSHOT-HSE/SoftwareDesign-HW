@@ -165,7 +165,7 @@ class Cd(Command):
         """ Changes current working directory. """
         if len(args) > 1:
             raise CommandException('cd: too many arguments, found {} arguments'.format(len(args)))
-        path = args[0] if len(args) == 1 else os.getenv('HOME')
+        path = args[0] if len(args) == 1 else os.path.expanduser('~')
         try:
             os.chdir(path)
         except FileNotFoundError as error:
