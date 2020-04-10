@@ -194,6 +194,7 @@ class TestCd(unittest.TestCase):
     def test_cd_file(self):
         with self.assertRaises(CommandException) as raised:
             Cd.run([os.path.join('test', 'resources', 'for_ls', 'file')], '')
+        os.chdir(self.root)
 
 
 class TestGrep(unittest.TestCase):
