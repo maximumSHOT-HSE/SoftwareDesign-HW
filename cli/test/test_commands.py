@@ -1,6 +1,7 @@
 import os
 import unittest
-from src.commands import Echo, Cat, Wc, External, Pwd, Grep, CommandException
+
+from src.commands import Echo, Cat, Wc, External, Pwd, Grep, CommandException, Ls, Cd
 
 
 class TestEcho(unittest.TestCase):
@@ -132,6 +133,68 @@ class TestPwd(unittest.TestCase):
 
     def test_pwdWithInput(self):
         self.assertEqual(Pwd.run([], 'duck'), self.path)
+
+
+class TestLs(unittest.TestCase):
+    def setUp(self):
+        self.path = os.path.join('test', 'resources', 'for_ls')
+        self.root = os.getcwd()
+
+    def test_ls_with_argument(self):
+        expected_list = 'dir1 dir2 file'.split(' ')
+        found_list = Ls.run([self.path], '123').split(' ')
+        expected_list.sort()
+        found_list.sort()
+        self.assertEqual(expected_list, found_list)
+
+    def test_ls_without_argument(self):
+        os.chdir(self.path)
+        expected_list = 'dir1 dir2 file'.split(' ')
+        found_list = Ls.run([], '456').split(' ')
+        expected_list.sort()
+        found_list.sort()
+        self.assertEqual(expected_list, found_list)
+        os.chdir(self.root)
+
+    def test_ls_with_too_many_arguments(self):
+        with self.assertRaises(CommandException) as raised:
+            Ls.run(['.'] * 10, None)
+        self.assertEqual('ls: too many arguments, found 10 arguments', str(raised.exception))
+
+
+class TestCd(unittest.TestCase):
+
+    def setUp(self):
+        self.root = os.getcwd()
+
+    def test_cd_without_arguments(self):
+        Cd.run([], '')
+        self.assertEqual(os.path.expanduser('~'), os.getcwd())
+        os.chdir(self.root)
+
+    def test_cd_with_too_many_arguments(self):
+        with self.assertRaises(CommandException) as raised:
+            Cd.run(['.'] * 10, None)
+        self.assertEqual('cd: too many arguments, found 10 arguments', str(raised.exception))
+        os.chdir(self.root)
+
+    def test_cd_with_one_argument(self):
+        mem_dir = os.getcwd()
+        Cd.run([os.path.join('test', 'resources')], '')
+        self.assertEqual(os.path.join(mem_dir, os.path.join('test', 'resources')), os.getcwd())
+        Cd.run(['..'], '')
+        self.assertEqual(os.path.join(mem_dir, 'test'), os.getcwd())
+        Cd.run(['..'], '')
+        self.assertEqual(mem_dir, os.getcwd())
+        if os.name == 'posix':
+            Cd.run(['/home'], '')
+            self.assertEqual('/home', os.getcwd())
+        os.chdir(self.root)
+
+    def test_cd_file(self):
+        with self.assertRaises(CommandException) as raised:
+            Cd.run([os.path.join('test', 'resources', 'for_ls', 'file')], '')
+        os.chdir(self.root)
 
 
 class TestGrep(unittest.TestCase):

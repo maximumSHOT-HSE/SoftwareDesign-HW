@@ -144,6 +144,35 @@ class Pwd(Command):
         return os.getcwd()
 
 
+class Ls(Command):
+    """ Class for emulating running the ls command. """
+    @staticmethod
+    def run(args, input):
+        """ Returns the list of files and directories in given directory. """
+        if len(args) > 1:
+            raise CommandException('ls: too many arguments, found {} arguments'.format(len(args)))
+        path = args[0] if len(args) == 1 else os.getcwd()
+        try:
+            return ' '.join(os.listdir(path))
+        except FileNotFoundError as error:
+            raise CommandException('ls: {}'.format(error))
+
+
+class Cd(Command):
+    """ Class for emulating running the cd command. """
+    @staticmethod
+    def run(args, input):
+        """ Changes current working directory. """
+        if len(args) > 1:
+            raise CommandException('cd: too many arguments, found {} arguments'.format(len(args)))
+        path = args[0] if len(args) == 1 else os.path.expanduser('~')
+        try:
+            os.chdir(path)
+        except Exception as error:
+            raise CommandException('cd: {}'.format(error))
+        return ''
+
+
 class Wc(Command):
     """ Class for emulating running the wc command. """
     @staticmethod

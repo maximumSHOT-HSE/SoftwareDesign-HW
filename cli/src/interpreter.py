@@ -3,7 +3,7 @@
 import re
 from os import environ
 
-from src.commands import Echo, Cat, Grep, Wc, External, Pwd, CommandException
+from src.commands import Echo, Cat, Cd, Grep, Wc, External, Ls, Pwd, CommandException
 from src.parseutils import CommandExpander, PipelineSplitter
 
 
@@ -43,7 +43,9 @@ class Interpreter(object):
         self._expander = CommandExpander(self._variables)
         self._supported_commands = _InterpreterCommands({'echo': Echo,
                                                          'cat': Cat,
+                                                         'cd': Cd,
                                                          'wc': Wc,
+                                                         'ls': Ls,
                                                          'pwd': Pwd,
                                                          'grep': Grep})
 
