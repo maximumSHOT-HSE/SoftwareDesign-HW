@@ -169,7 +169,10 @@ class TestCd(unittest.TestCase):
 
     def test_cd_without_arguments(self):
         Cd.run([], '')
-        self.assertEqual(os.getenv('HOME'), os.getcwd())
+        self.assertEqual(
+            os.getenv('HOME') if os.name == 'posix' else os.getenv('USERPROFILE'),
+            os.getcwd()
+        )
         os.chdir(self.root)
 
     def test_cd_with_too_many_arguments(self):
