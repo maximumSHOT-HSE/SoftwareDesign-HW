@@ -168,7 +168,7 @@ class Cd(Command):
         path = args[0] if len(args) == 1 else os.path.expanduser('~')
         try:
             os.chdir(path)
-        except FileNotFoundError as error:
+        except Exception as error:
             raise CommandException('cd: {}'.format(error))
         return ''
 
