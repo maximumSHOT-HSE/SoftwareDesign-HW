@@ -191,6 +191,10 @@ class TestCd(unittest.TestCase):
             self.assertEqual('/home', os.getcwd())
         os.chdir(self.root)
 
+    def test_cd_file(self):
+        with self.assertRaises(CommandException) as raised:
+            Cd.run([os.path.join('test', 'resources', 'for_ls', 'file')], '')
+
 
 class TestGrep(unittest.TestCase):
     def setUp(self):
